@@ -1,0 +1,78 @@
+<?php
+
+class Get {
+  public static function sql($query, $params = []) {
+    $db = DB::getInstance();
+
+    $stmt = $db->prepare($query);
+    $stmt->execute($params);
+
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if ($result === false) {
+      return false;
+    } else {
+      return $result;
+    }
+  }
+
+  public static function var($name, $default = null) {
+    return isset($_GET[$name]) ? $_GET[$name] : $default;
+  }
+}
+
+class Post {
+  public static function sql($query, $params = []) {
+    $db = DB::getInstance();
+
+    $stmt = $db->prepare($query);
+    $stmt->execute($params);
+
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if ($result === false) {
+      return false;
+    } else {
+      return $result;
+    }
+  }
+
+  public static function var($name, $default = null) {
+    return isset($_POST[$name]) ? $_POST[$name] : $default;
+  }
+}
+
+class DB {
+  private static $instance = null;
+
+  private function __construct() {
+    try {
+      $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+      self::$instance = new PDO($dsn, DB_USER, DB_PASS, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+      ]);
+    } catch (PDOException $e) {
+      echo "Database connection failed: " . $e->getMessage();
+      exit();
+    }
+  }
+
+  public static function getInstance() {
+    if (!isset(self::$instance)) {
+      new DB();
+    }
+
+    return self::$instance;
+  }
+}
+
+class Utils {
+  public static function redirect($url) {
+    header("Location: " . $url);
+    exit();
+  }
+}
+
+?>
